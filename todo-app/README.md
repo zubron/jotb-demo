@@ -51,3 +51,27 @@ To print only the URL, use the following command:
 ```
 minikube service demo-prom-demo --url
 ```
+
+## S1: Exporting Prometheus metrics
+
+To export Prometheus metrics from our API, we can use a [Prometheus client for Node.js](https://github.com/siimon/prom-client).
+
+We add this client library as a dependency of our project (including it in [`package.json`](./app/package.json)).
+To use the library, we instantiate an instance of it in the code for handling the [API routes](./app/api/routes.js), and use the client to collect default metrics about the Node.js process.
+We then add an additional endpoint to our API (`/metrics`) which, when requested, sends all the metrics our Prometheus client has gathered.
+
+To deploy this code, [build the latest image](#building-the-images).
+The Helm chart contains changes in this branch to use this latest image.
+To update your `helm` deployment use the following command:
+
+```
+helm upgrade demo chart
+```
+
+You can check the status of the deployment using the [previous instructions](#deploying-the-application).
+
+Once the new version has been deployed, you can see the metrics that are being exported by visting:
+
+```
+$(minikube service demo-prom-demo --url)/metrics
+```

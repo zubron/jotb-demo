@@ -36,3 +36,13 @@ Then, follow the [`prometheus` README](./prometheus/README.md) to verify that yo
 provided configuration.
 
 Having problems? Please open an issue in this project :)
+
+### S1
+
+In this branch, we add support for exporting Prometheus metrics from the
+API in `todo-app`.
+
+See the [`todo-app` README](./todo-app/README.md) for more details.
+
+These metrics can be queried within the Prometheus UI as our configuration
+already has an [entry for the ToDo API](./prometheus/prometheus.yml)
