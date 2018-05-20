@@ -1,0 +1,24 @@
+groups:
+  - name: APIAlerts
+    rules:
+      - alert: ErrorRate
+        expr: sum(rate(http_request_duration_ms_count{code="500"}[5m])) / sum(rate(http_request_duration_ms_count[5m])) > 0.1
+        for: 1m
+        labels:
+          severity: alert
+        annotations:
+          description: 'Percentage of 500 responses from API is over 10%: {{ $value }}'
+          summary: 'High percentage of 500 responses'
+
+  # The following is a rule that is guaranteed to fire.
+  # This is just to check that the configuration is working correctly.
+  # - name: DummyRule
+  #   rules:
+  #     - alert: GoRoutines
+  #       expr: sum(go_goroutines) > 0
+  #       for: 1m
+  #       labels:
+  #         severity: alert
+  #       annotations:
+  #         description: 'Test alert works'
+  #         summary: 'Test alert works'
