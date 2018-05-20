@@ -26,3 +26,13 @@ git checkout s0
 
 and follow the instructions.
 After this, move on to the next branches in turn and continue to follow the instructions for each.
+
+### S0
+
+This stage is to confirm that you can run the application code.
+
+Follow the [`todo-app` README](./todo-app/README.md) to verify that the application is running correctly.
+Then, follow the [`prometheus` README](./prometheus/README.md) to verify that you can run Prometheus using the
+provided configuration.
+
+Having problems? Please open an issue in this project :)
