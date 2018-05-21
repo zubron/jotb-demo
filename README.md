@@ -55,3 +55,17 @@ API in `todo-app`.
 We will add metrics of each of the [four types](https://prometheus.io/docs/concepts/metric_types/).
 
 See the [`todo-app` README](./todo-app/README.md) for more details.
+
+### S3
+
+In this branch, we modify the code in `todo-app` to trigger an already configured alert.
+Our Prometheus instance has already been [configured to alert](./prometheus/alert_rules.yml) if the
+percentage of 500 responses exceeds 10% over a 5 minute period.
+If this alert is triggered, it will send the alert to Alertmanager, which in turn will send a
+message to Slack using the configured webhook.
+
+For details of how the alert is triggered from the API, see the
+[`todo-app` README](./todo-app/README.md) for more details.
+
+To simulate API usage, you can use the included [`api-client`](./api-client/README.md) which will
+allow the error case to be produced more quickly.

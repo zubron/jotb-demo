@@ -163,3 +163,31 @@ The metrics will most likely be available at the end of response so you may need
 
 You can also view these metrics in your Prometheus UI within a few minutes.
 On the graph page, open the dropdown of metrics and look for the metric names added to the code (`todo_items_created`, etc.).
+
+## S3: Triggering an alert
+
+We can modify the code to produce more errors which will trigger an alert from Prometheus.
+To produce more errors, this branch introduces a change which causes the API to respond
+with `500` if the user attempts to create a ToDo item when there are 10 or more in the list.
+
+The endpoint to create the ToDo has been modified to count the number of ToDos that already exist.
+If there less than 10, proceed to create the new item. If there are 10 or more, respond with 500.
+All other endpoints will continue to work as expected, existing items can be viewed or removed.
+
+To deploy this code, [build the latest image](#building-the-images).
+The Helm chart contains changes in this branch to use this latest image.
+To update your `helm` deployment use the following command:
+
+```
+helm upgrade demo chart
+```
+
+You can check the status of the deployment using the [previous instructions](#deploying-the-application).
+
+Once the new version has been deployed, you can interact with the API directly, by manually attempting to create
+more than 10 ToDo items, or use the API client.
+You can view the status of the alert in the [Prometheus UI](http://192.168.100.100:9090/alerts).
+Once the error condition is true, the alert will go into `Pending` state for one minute before the Alertmanager
+is notified.
+Once the Alertmanager is notified, you can view the alert in the [Alertmanager UI](http://192.168.100.100:9093/#/alerts).
+Alertmanager will then send the alert to the configured receiver, in this case the Slack webhook.

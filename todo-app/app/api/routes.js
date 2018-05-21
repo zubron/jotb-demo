@@ -94,22 +94,35 @@ module.exports = (app) => {
 
     // create todo and send back all todos after creation
     app.post('/api/todos', (req, res) => {
-        // create a todo, information comes from AJAX request from Angular
-        Todo.create({
-            text: req.body.text,
-            complete: false
-        }, (err, todo) => {
+        Todo.count({}, (err, count) => {
             if (err) {
                 total_errors.inc();
                 res.send(err);
                 return;
             }
 
-            total_todos.inc();
-            incomplete_todos.inc();
-            // get and return all the todos after you create another
-            getTodos(res);
+            if (count < 10) {
+                // create a todo, information comes from AJAX request from Angular
+                Todo.create({
+                    text: req.body.text,
+                    complete: false
+                }, (err, todo) => {
+                    if (err) {
+                        total_errors.inc();
+                        res.send(err);
+                        return;
+                    }
+
+                    total_todos.inc();
+                    incomplete_todos.inc();
+                    // get and return all the todos after you create another
+                    getTodos(res);
+                });
+            } else {
+                res.status(500).send('Too many ToDo items');
+            }
         });
+
     });
 
     // update a todo with complete status
