@@ -46,3 +46,12 @@ See the [`todo-app` README](./todo-app/README.md) for more details.
 
 These metrics can be queried within the Prometheus UI as our configuration
 already has an [entry for the ToDo API](./prometheus/prometheus.yml)
+
+### S2
+
+In this branch, we add some application specifics metrics to the
+API in `todo-app`.
+
+We will add metrics of each of the [four types](https://prometheus.io/docs/concepts/metric_types/).
+
+See the [`todo-app` README](./todo-app/README.md) for more details.

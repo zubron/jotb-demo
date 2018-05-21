@@ -75,3 +75,91 @@ Once the new version has been deployed, you can see the metrics that are being e
 ```
 $(minikube service demo-prom-demo --url)/metrics
 ```
+
+## S2: Adding application specific metrics
+
+We can now use the Prometheus client library to instrument our code to collect application specific metrics.
+
+We will add:
+ * Counter to count the total number of ToDo items created
+ * Counter to count the total number of errors encountered
+ * Gauge to track the number of incomplete ToDo items
+ * Histogram for observing the duration in milliseconds to serve HTTP requests
+ * Summary to provide quantiles of the duration in milliseconds to serve HTTP requests
+
+We create each of these metrics in the same file where we handle the [API routes](./app/api/routes.js).
+When creating each metric, we provide the metric name and a help description.
+The metric name is used when later querying this metric within Prometheus.
+For our Histogram and Summary, we provide additional labels to create unique time series.
+We add labels for the HTTP `method`, `route`, and `response` code.
+
+When creating the Histogram, we need to provide buckets for our observations.
+Since we are using our Histogram for observing the time it takes to serve HTTP requests, we need to provide buckets for expected response times.
+In this case we are using `[5, 10, 25, 50, 100, 250, 500, 1000]`.
+If a response takes 73ms, the counter for the `100` bucket will be incremented as the value is less than 100 but is more than 50.
+If a response takes longer than 1000ms, it will be placed in a bucket provided by Prometheus called `Inf+`.
+This bucket is used for all observations that are larger than the maximum bucket size.
+
+When creating the Summary, we need to provide quantiles for the Prometheus client to calculate.
+In this case we are using the following quantiles: `[0.5, 0.75, 0.9, 0.99]`.
+This will enable us to see various quantiles for each of the request combinations, e.g. what is 0.99 quantile for `GET` requests?
+
+Once each of the metrics has been defined, we need to modify our code to record observations.
+The API has a number of endpoints for listing, creating, and deleting ToDo items.
+
+When an error is encountered in any of these endpoints, we will increment the errors counter as follows:
+
+```
+total_errors.inc();
+```
+
+When a ToDo item is created, we increment the ToDo item counter and the incomplete ToDo item gauge:
+
+```
+total_todos.inc();
+incomplete_todos.inc();
+```
+
+When a ToDo item is deleted, we decrement the incomplete ToDo item gauge:
+
+```
+incomplete_todos.dec();
+```
+
+To observe how long our responses take, we will use an [Express application-level middleware](https://expressjs.com/en/guide/using-middleware.html).
+We will use this middleware to record the start time of the request, and when the request is finished, calculate the total time.
+We will then record an observation for both the Histogram and the Summary:
+
+```
+httpRequestDurationHistogram
+    .labels(req.method, route, res.statusCode)
+    .observe(responseTimeInMs);
+
+httpRequestDurationSummary
+    .labels(req.method, route, res.statusCode)
+    .observe(responseTimeInMs);
+```
+
+We don't need to make any further changes to our `/metrics` endpoint handler.
+All the newly recorded metrics will be automatically exported by the client.
+
+To deploy this code, [build the latest image](#building-the-images).
+The Helm chart contains changes in this branch to use this latest image.
+To update your `helm` deployment use the following command:
+
+```
+helm upgrade demo chart
+```
+
+You can check the status of the deployment using the [previous instructions](#deploying-the-application).
+
+Once the new version has been deployed, you can see the new metrics that are being exported by visting:
+
+```
+$(minikube service demo-prom-demo --url)/metrics
+```
+
+The metrics will most likely be available at the end of response so you may need to scroll futher to see them.
+
+You can also view these metrics in your Prometheus UI within a few minutes.
+On the graph page, open the dropdown of metrics and look for the metric names added to the code (`todo_items_created`, etc.).
