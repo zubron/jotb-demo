@@ -69,3 +69,11 @@ For details of how the alert is triggered from the API, see the
 
 To simulate API usage, you can use the included [`api-client`](./api-client/README.md) which will
 allow the error case to be produced more quickly.
+
+### S4
+
+In this branch, we revert the code from the previous branch that triggered the alert.
+
+Once the change has been reverted and deployed, the error rate will decrease, and eventually the
+alert will stop firing. Once this has happened, the Alertmanager will send another message to the
+configured Slack webhook to state that the error has been resolved.

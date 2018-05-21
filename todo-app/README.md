@@ -191,3 +191,11 @@ Once the error condition is true, the alert will go into `Pending` state for one
 is notified.
 Once the Alertmanager is notified, you can view the alert in the [Alertmanager UI](http://192.168.100.100:9093/#/alerts).
 Alertmanager will then send the alert to the configured receiver, in this case the Slack webhook.
+
+## S4: Reverting the alert trigger
+
+We now modify the code to revert the change that caused the alert to be triggered.
+Once the revert has been deployed and the error responses are no longer occurring, the error rate will decrease
+over time and the alert will stop firing.
+Once the alert is no longer active, Alertmanager will send another message to the configured Slack webhook
+receiver to state that the error has been resolved.
