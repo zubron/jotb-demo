@@ -77,3 +77,13 @@ In this branch, we revert the code from the previous branch that triggered the a
 Once the change has been reverted and deployed, the error rate will decrease, and eventually the
 alert will stop firing. Once this has happened, the Alertmanager will send another message to the
 configured Slack webhook to state that the error has been resolved.
+
+### S5
+
+This branch contains an optional change to show how you can modify your Helm chart to be
+scraped using Kubernetes service discovery.
+
+If you are running Prometheus in Kubernetes alongside your application, you can modify your
+[service definition](./todo-app/chart/templates/service.yaml) to add an annotation to use service
+discovery.
+With this annotation, Prometheus will add your service as a target, and will scrape it.
