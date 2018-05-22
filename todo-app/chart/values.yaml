@@ -4,7 +4,7 @@
 replicaCount: 1
 image:
   repository: todo-demo
-  tag: s5
+  tag: master
   pullPolicy: IfNotPresent
 service:
   name: todo-app
